@@ -30,6 +30,17 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 public class UserSymptom extends AppCompatActivity {
 
@@ -180,6 +191,42 @@ public class UserSymptom extends AppCompatActivity {
         showMessage("Your Personal Records :", stringBuffer.toString());
         cursor.close();
         db.close();
+        String sendData=name+" "+age+" "+location+" "+country+" "+val[0]+" "+val[1]+" "+val[2]+" "+val[3];
+        HttpSend httas = new HttpSend();
+        httas.execute(sendData);
+    }
+    private class HttpSend extends AsyncTask<String, Void, String>
+
+    {
+        @Override
+        protected String doInBackground(String... str) {
+            try
+            {
+
+                //String get_url = "http://113.11.61.167/appserver.php/receive?q=" + str[0].replace(" ", "%20");
+                //String get_url = "http://113.11.61.167/";
+                String get_url = "https://nasa-maliha-93.c9users.io/appserver.php/receive?q=" + str[0].replace(" ", "%20");
+                HttpClient Client = new DefaultHttpClient();
+                HttpGet httpget;
+                ResponseHandler<String> responseHandler = new BasicResponseHandler();
+                httpget = new HttpGet(get_url);
+                String content = Client.execute(httpget, responseHandler);
+
+                return content;
+
+
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
+            return "Cannot Connect";
+        }
+
+        protected void onPostExecute(String result) {
+            //showMessage("server recieved:",result);
+        }
+
     }
 
     public void showMessage(String title, String message) {
